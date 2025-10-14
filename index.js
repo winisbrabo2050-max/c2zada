@@ -1,25 +1,28 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const cors = require('cors');
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+app.use(cors());
+app.use(express.json());
 
-// Rota simples para testar se o servidor está online
 app.get('/', (req, res) => {
-  res.send('Servidor C2 rodando...');
+  res.send('Servidor C2 ativo');
 });
 
-// Escuta conexões WebSocket
-io.on('connection', (socket) => {
-  console.log('📲 Cliente conectado');
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: '*',
+  }
+});
 
-  // Recebe horário em tempo real do app Android
-  socket.on('horario', (data) => {
+io.on('connection', socket => {
+  console.log('📡 Cliente conectado via WebSocket');
+
+  socket.on('hora', data => {
     console.log('🕒 Horário recebido:', data);
-    // Você pode salvar, processar ou responder aqui
-    socket.emit('confirmacao', 'Horário recebido com sucesso');
   });
 
   socket.on('disconnect', () => {
@@ -27,6 +30,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log('🚀 Servidor rodando na porta 3000');
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
