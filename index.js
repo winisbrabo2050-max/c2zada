@@ -22,8 +22,9 @@ io.on('connection', socket => {
   console.log('📡 Cliente conectado via WebSocket');
 
   socket.on('hora', data => {
-    console.log('🕒 Horário recebido:', data);
-  });
+  console.log('🕒 Horário recebido:', data);
+  io.emit('hora', data); // ✅ envia para todos os clientes conectados
+});
 
   socket.on('disconnect', () => {
     console.log('❌ Cliente desconectado');
@@ -34,3 +35,4 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
+
