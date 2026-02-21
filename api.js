@@ -170,17 +170,13 @@ async function processarFila() {
     if (!copiaCola) {
       res.json({
         status: 'erro',
-        erro: 'Não foi possível obter o código PIX (copia e cola).',
-        texto: textoMsg,
-        raw: respostaBot
+        erro: 'Não foi possível obter o código PIX (copia e cola).'
       });
     } else {
       res.json({
         status: 'pix_gerado',
-        texto: textoMsg,
         valorEnviado: valor,
-        copiaCola,
-        raw: respostaBot
+        copiaCola
       });
     }
   } catch (err) {
@@ -209,3 +205,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`API rodando na porta ${PORT}`);
 });
+
