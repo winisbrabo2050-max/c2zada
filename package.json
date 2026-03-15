@@ -1,17 +1,12 @@
 {
-  "name": "mtproto",
+  "name": "servidor-c2",
   "version": "1.0.0",
-  "main": "api.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node api.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@mtproto/core": "^6.3.0",
-    "express": "^5.2.1"
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
   }
 }
