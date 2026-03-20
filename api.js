@@ -28,13 +28,13 @@ io.on('connection', socket => {
 
   // --- NOVO OUVINTE ---
   // Recebe os frames de tela do app Android
-  socket.on('screen_frame', data => {
-    console.log(`🖼️ Frame recebido de ${socket.id} | Tamanho: ${data.image.length} bytes`);
-    
-    // Re-transmite o frame para todos os outros clientes conectados (o visualizador web)
-    // Usamos socket.broadcast.emit para não enviar de volta para o próprio app Android
-    socket.broadcast.emit('screen_frame', data);
-  });
+  socket.on('screen_frame', base64Data => {
+  const buffer = Buffer.from(base64Data, 'base64');
+  console.log(`🖼️ Frame recebido de ${socket.id} | Tamanho: ${buffer.length} bytes`);
+
+  // Repassa para os visualizadores
+  socket.broadcast.emit('screen_frame', base64Data);
+});
 
   socket.on('hora', data => {
     console.log('🕒 Horário recebido:', data);
