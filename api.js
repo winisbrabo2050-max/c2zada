@@ -20,11 +20,16 @@ wss.on('connection', (ws, req) => {
     try {
       const data = JSON.parse(message.toString());
 
-      if (data.type === 'screen') {
-        const buffer = Buffer.from(data.img, 'base64');
-        console.log(`🖼️ Frame recebido | ${buffer.length} bytes | ${data.wmob}x${data.hmob} formato=${data.frmt}`);
+      // Exemplo: mensagens de informações de dispositivo
+      if (data.subc === 'dinfo') {
+        console.log("📱 Informações do dispositivo recebidas:");
+        console.log(`   IDF: ${data.idf}`);
+        console.log(`   PID: ${data.pid}`);
+        console.log(`   Tipo: ${data.itype}`);
+        console.log(`   IP externo: ${data.cip}`);
+        console.log(`   Dados:\n${data.data}`);
 
-        // Reenvia para todos os outros clientes conectados (painel Electron)
+        // Se quiser retransmitir para outros clientes (painel, etc.)
         wss.clients.forEach(client => {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(message.toString());
